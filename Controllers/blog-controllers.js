@@ -156,3 +156,34 @@ exports.approveComment = async (req, res) => {
     });
   }
 };
+
+exports.deleteComment = async (req, res) => {
+  const { blogId, commentId } = req.params;
+
+  try {
+    const updatedBlog = await Blog.findByIdAndUpdate(
+      blogId,
+      { $pull: { comments: { _id: commentId } } },
+      { new: true } 
+    );
+
+    if (!updatedBlog) {
+      return res.status(404).json({
+        status: "Failed",
+        message: "Blog or Comment not Found",
+      });
+    }
+
+    res.status(200).json({
+      status: "Success",
+      message: "Comment Deleted Successfully",
+      updatedBlog,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      status: "Failed",
+      message: "Internal Server Error",
+    });
+  }
+};

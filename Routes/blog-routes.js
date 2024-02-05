@@ -5,6 +5,7 @@ const {
   getPostById,
   deleteBlog,
   approveComment,
+  deleteComment,
 } = require("../Controllers/blog-controllers");
 const upload = require("../config/multerConfig");
 const express = require("express");
@@ -27,6 +28,9 @@ router.post("/create", authenticateToken, upload.single("image"), createPost);
 router.delete("/delete/:id", authenticateToken, deleteBlog);
 
 //Route for approving comment
-router.post('/:blogId/comment/:commentId', approveComment);
+router.get("/:blogId/comment/:commentId", approveComment);
+
+//Route to delete the comment
+router.delete("/delete/:blogId/comment/:commentId", deleteComment);
 
 module.exports = router;
