@@ -70,6 +70,18 @@ exports.getPostById = async (req, res) => {
   }
 };
 
+exports.getBlogsByAuthorId = async (req, res) => {
+  try {
+    const authorId = req.user._id; // Access the user ID from the request object
+    const blogs = await Blog.find({ authorId: authorId });
+
+    res.json(blogs);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
 // Comment on a blog
 exports.createComment = async (req, res) => {
   const { blogId } = req.params;
@@ -164,7 +176,7 @@ exports.deleteComment = async (req, res) => {
     const updatedBlog = await Blog.findByIdAndUpdate(
       blogId,
       { $pull: { comments: { _id: commentId } } },
-      { new: true } 
+      { new: true }
     );
 
     if (!updatedBlog) {
@@ -185,5 +197,20 @@ exports.deleteComment = async (req, res) => {
       status: "Failed",
       message: "Internal Server Error",
     });
+  }
+};
+
+exports.searchByTitle = async (req, res) => {
+  try {
+    const { title } = req.query;
+
+    const blogs = await Blog.find({
+      title: { $regex: new RegExp(title, "i") },
+    });
+
+    res.json({ blogs });
+  } catch (error) {
+    console.error("Error searching for blog by title:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
